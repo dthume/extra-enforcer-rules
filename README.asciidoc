@@ -1,0 +1,10 @@
+extra-enforcer-rules
+====================
+David Thomas Hume
+:Author Initials: DTH
+
+Extra rules for the maven-enforcer-plugin.
+
+Maven generated project sites are available for the latest
+http://dthume.github.com/extra-enforcer-rules/[release] and
+http://dthu.me/projects/extra-enforcer-rules/[snapshot] versions.

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0     http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.dthume</groupId>
+    <artifactId>dthume-public</artifactId>
+    <version>0.2-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.dthume.maven</groupId>
+  <artifactId>extra-enforcer-rules</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>Extra Maven Enforcer Rules</name>
+  <inceptionYear>2011</inceptionYear>
+  <url>http://dthume.github.com/${project.artifactId}/</url>
+
+  <description>
+    Extra rules for the maven-enforcer-plugin
+  </description>
+
+  <scm>
+    <connection>scm:git:git://github.com/dthume/${project.artifactId}.git</connection>
+    <developerConnection>scm:git:git@github.com:dthume/${project.artifactId}.git</developerConnection>
+    <url>https://github.com/dthume/${project.artifactId}</url>
+  </scm>
+  
+  <distributionManagement>
+    <site>
+      <id>dthu.me.web</id>
+      <name>org.dthume Maven Website</name>
+      <url>https://github.com/dthume/${project.artifactId}/</url>
+    </site>
+  </distributionManagement>
+
+  <properties>
+    <junit.version>4.10</junit.version>
+    <org.apache.commons.commons-lang3.version>3.0.1</org.apache.commons.commons-lang3.version>
+    <org.apache.bsf.version>3.1</org.apache.bsf.version>
+    <org.apache.maven.version>2.2.1</org.apache.maven.version>
+    <org.codehaus.plexus.container.version>1.5.5</org.codehaus.plexus.container.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>  
+      <version>1.9.0</version> 
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.enforcer</groupId>
+      <artifactId>enforcer-api</artifactId>
+      <version>${org.apache.maven.plugins.maven-enforcer-plugin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>${org.apache.maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${org.apache.maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${org.apache.maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${org.apache.maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>${org.codehaus.plexus.container.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${org.apache.commons.commons-lang3.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.bsf</groupId>
+      <artifactId>bsf-api</artifactId>
+      <version>${org.apache.bsf.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.agilejava.docbkx</groupId>
+        <artifactId>docbkx-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
