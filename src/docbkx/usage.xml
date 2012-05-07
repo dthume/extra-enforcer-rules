@@ -40,6 +40,7 @@
   </para>
   
   <example>
+    <title>Adding the dependency to the enforcer plugin.</title>
     <programlisting language="xml"
 ><![CDATA[<project>
   <build>
@@ -47,7 +48,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>]]><?eval ${org.apache.maven.plugins.maven-enforcer-plugin.version}?><![CDATA[</version>
+        <version>1.0.1</version>
         <dependencies>
           <dependency>
             <groupId>]]><?eval ${project.groupId}?><![CDATA[</groupId>
@@ -55,10 +56,81 @@
             <version>]]><?eval ${project.version}?><![CDATA[</version>
           </dependency>
         </dependencies>
-      </plugin>   
+      </plugin>
     </plugins>
   </build>
-</project>
-]]></programlisting>
+</project>]]></programlisting>
   </example>
+
+  <section>
+    <title>The Script Rule</title>
+    <para>
+      The <code
+      xlink:href="./apidocs/org/dthume/maven/enforcer/ScriptRule.html"
+      >ScriptRule</code> is capable of evaluating a script via any
+      <link
+      xlink:href="http://en.wikipedia.org/wiki/Scripting_for_the_Java_Platform"
+      >JSR223</link> compliant <code
+      xlink:href="http://docs.oracle.com/javase/6/docs/api/javax/script/ScriptEngine.html"
+      >ScriptEngine</code>.
+
+      You will first need to add an appropriate scripting engine dependency
+      to the enforcer plugin, for example to make <link
+      xlink:href="http://groovy.codehaus.org">Groovy</link> available:
+    </para>
+
+    <example>
+      <title>Adding Groovy as a dependency to the enforcer plugin.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.8.6</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+    
+    <para>
+      With an appropriate scripting language available, the rule can then be
+      configured to execute an inline script as follows:
+    </para>
+
+    <example>
+      <title>Configuring an inline <code>ScriptRule</code>.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0.1</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <!-- Always pass -->
+              <script>1 === 1</script>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+
+  </section>
 </article>

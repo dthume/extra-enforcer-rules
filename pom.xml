@@ -38,7 +38,7 @@
 
   <properties>
     <junit.version>4.10</junit.version>
-    <org.apache.commons.commons-lang3.version>3.0.1</org.apache.commons.commons-lang3.version>
+    <org.apache.commons.commons-lang3.version>3.1</org.apache.commons.commons-lang3.version>
     <org.apache.bsf.version>3.1</org.apache.bsf.version>
     <org.apache.maven.version>2.2.1</org.apache.maven.version>
     <org.codehaus.plexus.container.version>1.5.5</org.codehaus.plexus.container.version>
