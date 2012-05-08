@@ -6,5 +6,4 @@ David Thomas Hume
 Extra rules for the maven-enforcer-plugin.
 
 Maven generated project sites are available for the latest
-http://dthume.github.com/extra-enforcer-rules/[release] and
-http://dthu.me/projects/extra-enforcer-rules/[snapshot] versions.
+http://dthu.me/projects/extra-enforcer-rules/[snapshot] version.
