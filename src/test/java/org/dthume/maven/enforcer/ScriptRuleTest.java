@@ -17,6 +17,9 @@ package org.dthume.maven.enforcer;
 
 import static org.mockito.Mockito.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
@@ -90,6 +93,22 @@ public class ScriptRuleTest {
         
         final ScriptRule rule = newInlineJSRule(script);
         rule.setRuleHelperKey(key);
+        rule.execute(helper);
+    }
+
+    @Test
+    public void ruleBindingsShouldBeAvailable() throws Exception {
+        final String script = "binding1 === binding2;";
+        final String value = "foo";
+        
+        final Map<String, Object> bindings = new HashMap<String, Object>();
+        bindings.put("binding1", value);
+        bindings.put("binding2", value);
+        
+        final EnforcerRuleHelper helper = mockHelper();
+        final ScriptRule rule = newInlineJSRule(script);
+        rule.setScriptBindings(bindings);
+        
         rule.execute(helper);
     }
 }
