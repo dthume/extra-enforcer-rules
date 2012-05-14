@@ -38,6 +38,10 @@
   </distributionManagement>
 
   <properties>
+    <!-- docbkx properties (which cannot contain periods) -->
+    <enforcerPluginVersion>${org.apache.maven.plugins.maven-enforcer-plugin.version}</enforcerPluginVersion>
+    
+    <!-- Dependency versions -->
     <junit.version>4.10</junit.version>
     <org.apache.commons.commons-lang3.version>3.1</org.apache.commons.commons-lang3.version>
     <org.apache.bsf.version>3.1</org.apache.bsf.version>
@@ -104,6 +108,10 @@
       <plugin>
         <groupId>com.agilejava.docbkx</groupId>
         <artifactId>docbkx-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

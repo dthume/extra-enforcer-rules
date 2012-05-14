@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
 
 public class ScriptRuleTest {
@@ -35,8 +36,14 @@ public class ScriptRuleTest {
         return rule;
     }
     
+    private EnforcerRuleHelper mockHelper() {
+        final EnforcerRuleHelper helper = mock(EnforcerRuleHelper.class);
+        when(helper.getLog()).thenReturn(mock(Log.class));
+        return helper;
+    }
+    
     private void executeInlineJSRule(String script) throws Exception {
-        executeInlineJSRule(mock(EnforcerRuleHelper.class), script);
+        executeInlineJSRule(mockHelper(), script);
     }
     
     private void executeInlineJSRule(EnforcerRuleHelper helper, String script)
@@ -72,14 +79,17 @@ public class ScriptRuleTest {
     }
     
     @Test
-    public void ruleHelperShouldBeAvailable() throws Exception {
+    public void ruleHelperShouldBeAvailableIfKeySet() throws Exception {
         final String expr = "expr";
-        final String script = String.format("%s.evaluate(\"%s\");",
-                ScriptRule.RULE_HELPER_KEY, expr);
-        final EnforcerRuleHelper helper = mock(EnforcerRuleHelper.class);
+        final String key = "helper";
+        final String script =
+                String.format("%s.evaluate(\"%s\");", key, expr);
+        final EnforcerRuleHelper helper = mockHelper();
 
         when(helper.evaluate(expr)).thenReturn(Boolean.TRUE);
-
-        executeInlineJSRule(helper, script);
+        
+        final ScriptRule rule = newInlineJSRule(script);
+        rule.setRuleHelperKey(key);
+        rule.execute(helper);
     }
 }

@@ -15,6 +15,18 @@
  */
 package org.dthume.maven.enforcer;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -26,33 +38,67 @@ import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.dthume.maven.enforcer.LogWriter.LogLevel;
 
 /**
  * An {@link EnforcerRule} which evaluates a JSR223 compliant script.
- * The {@link EnforcerRuleHelper} will be bound into the evaluation
- * context under the key {@link #RULE_HELPER_KEY}.
  *
  * @author dth
  */
 public final class ScriptRule implements EnforcerRule {
-    /** The key to bind the {@link EnforcerRuleHelper} to. */
-    public static final String RULE_HELPER_KEY = "mavenEnforcerRuleHelper";
+    /** The expression to get the user specified source file encoding. */
+    private static final String SOURCE_ENCODING =
+            "${project.build.sourceEncoding}";
 
-    /**
-     * Inline script source.
-     */
-    private String script = null;
-
+    /** The key to bind the rule helper to during script evaluation */
+    private String ruleHelperKey = null;
+    
     /** The scripting language to use, defaults to "javascript". */
     private String language = "javascript";
+    
+    /** Inline script source. */
+    private String script = null;
+
+    /** The file containing the script to execute. */
+    private File scriptFile = null;
+    
+    /** The result evaluator - determines if the script result is valid */
+    private ScriptResultEvaluator resultEvaluator =
+            new DefaultScriptResultEvaluator();
+    
+    /** The map of values to bind into the script evaluation context */
+    private Map<String, Object> scriptBindings =
+            java.util.Collections.emptyMap();
+    
+    /** The message to place into the exception upon rule failure */
+    private String message = "Script evaluated to false";
+    
+    /**
+     * Set the key to bind the {@link EnforcerRuleHelper} to.
+     * 
+     * @param key the name to bind the {@code EnforcerRuleHelper} to.
+     */
+    public void setRuleHelperKey(String key) { ruleHelperKey = key; }
 
     /**
-     * Set the inline script source to use.
+     * Set the script source to evaluate.
+     * 
+     * NOTE: Do not specify both this <i>and</i> {@link #scriptFile}.
      *
      * @param script the inline script source to use.
      */
     public void setScript(final String script) { this.script = script; }
 
+    /**
+     * Set the file containing the script to evaluate.
+     * 
+     * NOTE: Do not specify both this <i>and</i> {@link #script}.
+     *
+     * @param file the inline script source to use.
+     */
+    public void setScriptFile(final File file) { this.scriptFile = file; }
+    
     /**
      * Set the scripting language to use.
      *
@@ -60,6 +106,32 @@ public final class ScriptRule implements EnforcerRule {
      */
     public void setLanguage(final String lang) { this.language = lang; }
 
+    /**
+     * Set the evaluator to use to determine if the script result is valid 
+     * 
+     * @param evaluator the result evaluator to use
+     */
+    public void setResultEvaluator(ScriptResultEvaluator evaluator) {
+        this.resultEvaluator = evaluator;
+    }
+    
+    /**
+     * Set the map of bindings to apply during script evaluation 
+     * 
+     * @param bindings the map of bindings to apply during script evaluation
+     */
+    public void setScriptBindings(Map<String, Object> bindings) {
+        this.scriptBindings = bindings;
+    }
+    
+    /**
+     * Set the message to be placed into the {@link EnforcerRuleException}
+     * if script evaluation returns {@code false};
+     * 
+     * @param message the message to place into the exception on rule failure
+     */
+    public void setMessage(String message) { this.message = message; }
+    
     /** {@inheritDoc} */
     public boolean isCacheable() { return false; }
 
@@ -85,49 +157,82 @@ public final class ScriptRule implements EnforcerRule {
         }
 
         private void execute() throws EnforcerRuleException {
-            validate();
+            validateConfig();
+            
             final Object result = executeScript();
-            verifyResult(result);
-        }
 
-        private void validate() throws EnforcerRuleException {
-            // TODO - validate config
+            if (log.isDebugEnabled())
+                log.debug("Script result: " + result);
+            
+            if (!resultEvaluator.isValidResult(result))
+                throw new EnforcerRuleException(message);
+        }
+        
+        private void validateConfig() throws IllegalArgumentException {
+            String msg = null;
+            
+            if (null == scriptFile && isBlank(script))
+                msg = "One of script or scriptFile must be set";
+            if (!(null == scriptFile || isBlank(script)))
+                msg = "Cannot set both scriptFile and script";
+            
+            if (null != msg) throw new IllegalArgumentException(msg);
         }
 
         private Object executeScript() throws EnforcerRuleException {
             try {
-                return executeScriptInternal();
+                final ScriptEngine engine = createEngine();
+                final ScriptContext context = createScriptContext();
+                final Reader reader = getScriptReader();
+                
+                return engine.eval(reader, context);
             } catch (ScriptException e) {
                 throw new EnforcerRuleException("Script Exception", e);
             }
         }
+        
+        private Reader getScriptReader() throws EnforcerRuleException {
+            Reader reader = null;
+            if (isBlank(script)) {
+                if (log.isDebugEnabled())
+                    log.debug("Using script file: " + scriptFile);
 
-        private Object executeScriptInternal() throws ScriptException {
-            final ScriptEngine engine = createEngine();
-            final ScriptContext context = createScriptContext();
-            return engine.eval(script, context);
+                reader = getScriptFileReader();
+            } else {
+                log.debug("Using inline script");
+                reader = new StringReader(script);
+            }
+            return reader;
         }
-
-        private void verifyResult(final Object result)
-                throws EnforcerRuleException {
-            if (!isValidResult(result))
-                throw new EnforcerRuleException("Script evaluated to false");
+        
+        private Reader getScriptFileReader() throws EnforcerRuleException {
+            try {
+                final InputStream in = new FileInputStream(scriptFile);
+                return new InputStreamReader(in, getSourceEncoding());
+            } catch (FileNotFoundException e) {
+                throw new EnforcerRuleException("Script file not found", e);
+            } catch (UnsupportedEncodingException e) {
+                throw new EnforcerRuleException("Unsupported encoding", e);
+            }
         }
-
-        private boolean isValidResult(final Object result) {
-            if (null == result)
-                return false;
-            if (result instanceof Boolean)
-                return ((Boolean) result).booleanValue();
-            if (result instanceof Integer)
-                return 0 != ((Integer) result).intValue();
-            if (result instanceof Long)
-                return 0L != ((Long) result).longValue();
-            if (result instanceof Float)
-                return 0.0 != ((Float) result).floatValue();
-            if (result instanceof Double)
-                return 0.0D != ((Double) result).doubleValue();
-            return true;
+        
+        private String getSourceEncoding() {
+            String encoding = null;
+            try {
+                encoding = (String)helper.evaluate(SOURCE_ENCODING);
+            } catch (ExpressionEvaluationException e) {
+                log.debug("Caught exception looking up source encoding", e);
+            }
+            
+            if (isBlank(encoding)) {
+                log.debug("Using platform encoding");
+                encoding = java.nio.charset.Charset.defaultCharset().name();
+            }
+            
+            if (log.isDebugEnabled())
+                log.debug("Encoding to use for source files: " + encoding);
+            
+            return encoding;
         }
 
         private ScriptEngine createEngine() {
@@ -136,12 +241,36 @@ public final class ScriptRule implements EnforcerRule {
 
         private ScriptContext createScriptContext() {
             final SimpleScriptContext context = new SimpleScriptContext();
-
+            configureIO(context);
+            configureBindings(context);
+            return context;
+        }
+        
+        private void configureBindings(ScriptContext context) {
             final Bindings bindings =
                     context.getBindings(ScriptContext.ENGINE_SCOPE);
-            bindings.put(RULE_HELPER_KEY, helper);
-
-            return context;
+            
+            if (!isBlank(ruleHelperKey)) {
+                if (log.isDebugEnabled())
+                    log.debug("Binding rule helper to key: " + ruleHelperKey);
+                
+                bindings.put(ruleHelperKey, helper);
+            }
+            
+            for (Map.Entry<String, Object> entry : scriptBindings.entrySet()) {
+                final String key = entry.getKey();
+                final Object value = entry.getValue();
+                
+                if (log.isDebugEnabled())
+                    log.debug(String.format("Binding %s=%s", key, value));
+                
+                bindings.put(key, value);
+            }
+        }
+        
+        private void configureIO(ScriptContext context) {
+            context.setWriter(new LogWriter(log));
+            context.setErrorWriter(new LogWriter(log, LogLevel.ERROR));
         }
     }
 }

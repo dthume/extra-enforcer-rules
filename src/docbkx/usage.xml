@@ -48,7 +48,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
         <dependencies>
           <dependency>
             <groupId>]]><?eval ${project.groupId}?><![CDATA[</groupId>
@@ -72,12 +72,14 @@
       xlink:href="http://en.wikipedia.org/wiki/Scripting_for_the_Java_Platform"
       >JSR223</link> compliant <code
       xlink:href="http://docs.oracle.com/javase/6/docs/api/javax/script/ScriptEngine.html"
-      >ScriptEngine</code>. Note, however, that the rule uses the <link
+      >ScriptEngine</code>.
+      
+      Note, however, that the rule uses the <link
       xlink:href="http://commons.apache.org/bsf/">Bean Scripting
       Framework</link> version 3+ in order to support deployment to JDK 1.5
       environments.
 
-      If you are running in a JRE prior to version 6, or you wish to use a
+      If you are running in a JRE prior to version 6, or wish to use a
       scripting language other than JavaScript, then you will first need to
       add an appropriate scripting engine dependency, such as <link
       xlink:href="http://groovy.codehaus.org">Groovy</link>
@@ -93,7 +95,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
         <dependencies>
           <dependency>
             <groupId>org.codehaus.groovy</groupId>
@@ -121,13 +123,116 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
         <configuration>
           <rules>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
               <language>javascript</language>
               <!-- Always pass -->
               <script>1 === 1</script>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+
+    <example>
+      <title>Configuring a <code>ScriptRule</code> with a file.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <scriptFile>src/main/script/script.js</scriptFile>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+
+    <example>
+      <title>Setting a custom  failure message.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <!-- always fail -->
+              <script>false;</script>
+              <message>Custom failure message</message>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+
+    <example>
+      <title>Getting access to the <code>EnforcerRuleHelper</code>.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <ruleHelperKey>helper</ruleHelperKey>
+              <script>helper.evaluate("${someExpression}");</script>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+    </example>
+
+    <example>
+      <title>Specifying custom script bindings.</title>
+      <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <script>binding1 === binding2</script>
+              <scriptBindings>
+                <binding1>${someExpression}</binding1>
+                <binding2>literal value</binding2>
+              </scriptBindings>
             </scriptRule>
           </rules>
         </configuration>
