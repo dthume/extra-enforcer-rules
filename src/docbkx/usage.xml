@@ -339,7 +339,7 @@
       
       <para>
         Obviously, if you have no context to store and simply wish to avoid
-        evaluating a rule twice, then you can simply specify a
+        evaluating a rule twice, then you can specify a
         <code>validatorScript</code> which evaluates to <code>true</code>:
       </para>
 

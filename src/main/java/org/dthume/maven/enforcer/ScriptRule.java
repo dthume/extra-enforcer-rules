@@ -17,6 +17,7 @@ package org.dthume.maven.enforcer;
 
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.join;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +27,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -207,7 +210,7 @@ public final class ScriptRule implements EnforcerRule {
 
     /** {@inheritDoc} */
     public String getCacheId() {
-        if (!isCacheable()) return "" + hashCode();
+        if (!isCacheable()) return java.util.UUID.randomUUID().toString();
         
         return md5Hex(toCacheId(
                 "language", language,
@@ -216,7 +219,9 @@ public final class ScriptRule implements EnforcerRule {
                 "validatorScript", validatorScript,
                 "validatorScriptFile", toPathOrNull(validatorScriptFile),
                 "message", message,
-                "ruleHelperKey", ruleHelperKey));
+                "ruleHelperKey", ruleHelperKey,
+                "validationContextKey", validationContextKey,
+                "scriptBindings", toCacheId(scriptBindings)));
     }
     
     private String toPathOrNull(final File file) {
@@ -235,6 +240,20 @@ public final class ScriptRule implements EnforcerRule {
         }
         
         return sb.toString();
+    }
+    
+    private String toCacheId(Map<String, Object> map) {
+        final List<String> keys = new ArrayList<String>(map.keySet());
+        java.util.Collections.sort(keys);
+        
+        final List<String> values = new ArrayList<String>(keys.size());
+        for (final String key : keys)
+            values.add(key + "=" + map.get(key));
+        
+        return new StringBuilder("{")
+            .append(join(values, ","))
+            .append("}")
+            .toString();
     }
 
     /** {@inheritDoc} */
