@@ -24,12 +24,21 @@
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
               <language>javascript</language>
               <script>
+                java.lang.System.out.println("INVOKER_IT_TEST_MARKER_CACHED");
                 ruleContext.put("foo", 1);
                 true;
               </script>
               <validatorScript>
                 1 == ruleContext.get("foo");
               </validatorScript>
+            </scriptRule>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <script>
+                java.lang.System.out.println("INVOKER_IT_TEST_MARKER_NONCACHED");
+                true;
+              </script>
+              <validatorScript>false;</validatorScript>
             </scriptRule>
           </rules>
         </configuration>
