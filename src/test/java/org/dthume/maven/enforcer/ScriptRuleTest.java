@@ -15,6 +15,7 @@
  */
 package org.dthume.maven.enforcer;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public class ScriptRuleTest {
         final EnforcerRuleHelper helper = mockHelper();
 
         when(helper.evaluate(expr)).thenReturn(Boolean.TRUE);
-        
+
         final ScriptRule rule = newInlineJSRule(script);
         rule.setRuleHelperKey(key);
         rule.execute(helper);
@@ -100,15 +101,39 @@ public class ScriptRuleTest {
     public void ruleBindingsShouldBeAvailable() throws Exception {
         final String script = "binding1 === binding2;";
         final String value = "foo";
-        
+
         final Map<String, Object> bindings = new HashMap<String, Object>();
         bindings.put("binding1", value);
         bindings.put("binding2", value);
-        
+
         final EnforcerRuleHelper helper = mockHelper();
         final ScriptRule rule = newInlineJSRule(script);
         rule.setScriptBindings(bindings);
-        
+
         rule.execute(helper);
+    }
+
+    @Test
+    public void noValidationShouldNotCache() throws Exception {;
+        final EnforcerRuleHelper helper = mockHelper();
+
+        final ScriptRule rule = newInlineJSRule("true;");
+
+        rule.execute(helper);
+        assertFalse("cached result should be invalid", rule.isResultValid(rule));
+    }
+    
+    @Test
+    public void inlineValidationShouldSucceed() throws Exception {
+        final String script = "ruleContext.put(\"foo\", 1); true;";
+        final String validation = "1 == ruleContext.get(\"foo\");";
+        final EnforcerRuleHelper helper = mockHelper();
+
+        final ScriptRule rule = newInlineJSRule(script);
+        rule.setValidatorScript(validation);
+
+        rule.execute(helper);
+
+        assertTrue("cached result should be valid", rule.isResultValid(rule));
     }
 }

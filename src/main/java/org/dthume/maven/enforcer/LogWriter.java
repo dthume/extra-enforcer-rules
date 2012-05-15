@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.plugin.logging.Log;
 
 public class LogWriter extends Writer {
-    
+
     public static enum LogLevel {
         DEBUG {
             boolean isEnabled(Log log) { return log.isDebugEnabled(); }
@@ -40,26 +40,26 @@ public class LogWriter extends Writer {
             boolean isEnabled(Log log) { return log.isErrorEnabled(); }
             void write(Log log, String line) { log.error(line); }
         };
-        
+
         abstract boolean isEnabled(Log log);
         abstract void write(Log log, String line);
     }
-    
+
     private final static Pattern NEWLINES = Pattern.compile("\\n");
-    
+
     private final Log log;
     private final LogLevel level;
     private final StringBuffer buffer = new StringBuffer();
-    
+
     public LogWriter(Log log) {
         this(log, LogLevel.INFO);
     }
-    
+
     public LogWriter(Log log, LogLevel level) {
         this.log = log;
         this.level = level;
     }
-    
+
     @Override
     public void write(char[] buf, int off, int len) throws IOException {
         buffer.append(buf, off, len);
@@ -70,12 +70,10 @@ public class LogWriter extends Writer {
         if (level.isEnabled(log))
             for (final String line : NEWLINES.split(buffer))
                 level.write(log, line);
-        
+
         buffer.setLength(0);
     }
-    
+
     @Override
-    public void close() throws IOException {
-        flush();
-    }
+    public void close() throws IOException { flush(); }
 }
