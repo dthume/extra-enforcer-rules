@@ -12,7 +12,11 @@
   <artifactId>script-inline-js-pass</artifactId>
   <packaging>pom</packaging>
 
-  <name>Inline passing JS should build</name>
+  <name>Passing JS rules should build</name>
+
+  <properties>
+    <script.bindings.binding1>foo</script.bindings.binding1>
+  </properties>
 
   <build>
     <plugins>
@@ -37,6 +41,25 @@
               <language>javascript</language>
               <script>1.1;</script>
             </scriptRule>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <scriptFile>oneEqualsOne.js</scriptFile>
+            </scriptRule>
+              <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <script>binding1 === binding2;</script>
+              <scriptBindings>
+                <binding1>${script.bindings.binding1}bar</binding1>
+                <binding2>foobar</binding2>
+              </scriptBindings>
+            </scriptRule>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <script><![CDATA[
+                "foo" == helper.evaluate("${script.bindings.binding1}");
+              ]]></script>
+              <ruleHelperKey>helper</ruleHelperKey>
+            </scriptRule>          
           </rules>
         </configuration>
       </plugin>
