@@ -55,9 +55,9 @@
             </scriptRule>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
               <language>javascript</language>
-              <script><![CDATA[
+              <script>
                 "foo" == helper.evaluate("${script.bindings.binding1}");
-              ]]></script>
+              </script>
               <ruleHelperKey>helper</ruleHelperKey>
             </scriptRule>          
           </rules>
