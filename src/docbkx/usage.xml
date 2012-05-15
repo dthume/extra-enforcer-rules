@@ -242,5 +242,131 @@
 </project>]]></programlisting>
     </example>
 
+    <section>
+      <title>Script Rule Caching</title>
+      <para>
+        The <code
+        xlink:href="http://maven.apache.org/enforcer/enforcer-api/index.html"
+        >enforcer-api</code> provides hooks to support caching of rules, thus
+        avoiding the cost of evaluating the same rule multiple times in a
+        single build (for example during forked executions). By default
+        <code>ScriptRule</code> instances are <emphasis>not</emphasis> cached;
+        support for caching is provided on a per-rule basis via three
+        properties: one of <code>validatorScript</code> or
+        <code>validatorScriptFile</code> and (optionally)
+        <code>validationContextKey</code>.
+      </para>
+      <para>
+        The <code>validatorScript</code> and <code>validatorScriptFile</code>
+        properties allow authors to specify a script which will be run to
+        validate previous rule execution results. When one of these properties
+        is specified then the <code>validationContextKey</code> property will
+        be available (defaulting to <code>ruleContext</code>), allowing the
+        configuration of a key which will be used to bind a
+        <code
+        xlink:href="http://docs.oracle.com/javase/6/docs/api/java/util/Map.html"
+        >Map</code> instance during execution of both the initial script and
+        the validation script. This context map can be used by the initial
+        rule script to store any results which should be inspected by the
+        validator script to indicate if the previous cached result is still
+        valid. If the validation script evaluates to <code>true</code> via the
+        <code>ScriptResultEvaluator</code> then the cached result will be
+        used, otherwise the initial script will be re-executed.
+      </para>
+      
+      <example>
+        <title>Using an inline validator rule.</title>
+        <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <!-- Trivial example of passing context objects -->
+              <script>
+                ruleContext.put("foo", 1);
+                true;
+              </script>
+              <validatorScript>
+                1 == ruleContext.get("foo");
+              </validatorScript>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+      </example>
+      
+      <example>
+        <title>Using an inline validator rule with a custom key.</title>
+        <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <!-- Same as above, but with custom key -->
+              <validationContextKey>vContext</validationContextKey>
+              <script>
+                vContext.put("foo", 1);
+                true;
+              </script>
+              <validatorScript>
+                1 == vContext.get("foo");
+              </validatorScript>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+      </example>
+      
+      <para>
+        Obviously, if you have no context to store and simply wish to avoid
+        evaluating a rule twice, then you can simply specify a
+        <code>validatorScript</code> which evaluates to <code>true</code>:
+      </para>
+
+      <example>
+        <title>Simple rule caching.</title>
+        <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <scriptFile>src/script/someValidatorScript.js</scriptFile>
+              <validatorScript>true;</validatorScript>
+            </scriptRule>
+          </rules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+      </example>
+    </section>
   </section>
 </article>

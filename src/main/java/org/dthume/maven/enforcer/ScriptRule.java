@@ -15,6 +15,7 @@
  */
 package org.dthume.maven.enforcer;
 
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
@@ -208,14 +209,14 @@ public final class ScriptRule implements EnforcerRule {
     public String getCacheId() {
         if (!isCacheable()) return "" + hashCode();
         
-        return "" + toCacheId(
+        return md5Hex(toCacheId(
                 "language", language,
                 "script", script,
                 "scriptFile", toPathOrNull(scriptFile),
                 "validatorScript", validatorScript,
                 "validatorScriptFile", toPathOrNull(validatorScriptFile),
                 "message", message,
-                "ruleHelperKey", ruleHelperKey).hashCode();
+                "ruleHelperKey", ruleHelperKey));
     }
     
     private String toPathOrNull(final File file) {
@@ -232,6 +233,7 @@ public final class ScriptRule implements EnforcerRule {
                 .append(params[ii+1])
                 .append("]]>");
         }
+        
         return sb.toString();
     }
 

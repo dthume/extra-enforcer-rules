@@ -43,6 +43,7 @@
     
     <!-- Dependency versions -->
     <junit.version>4.10</junit.version>
+    <org.apache.commons.commons-codec.version>1.6</org.apache.commons.commons-codec.version>
     <org.apache.commons.commons-lang3.version>3.1</org.apache.commons.commons-lang3.version>
     <org.apache.bsf.version>3.1</org.apache.bsf.version>
     <org.apache.maven.version>2.2.1</org.apache.maven.version>
@@ -95,6 +96,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${org.apache.commons.commons-lang3.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${org.apache.commons.commons-codec.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.bsf</groupId>
