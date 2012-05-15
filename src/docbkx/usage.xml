@@ -265,13 +265,15 @@
         configuration of a key which will be used to bind a
         <code
         xlink:href="http://docs.oracle.com/javase/6/docs/api/java/util/Map.html"
-        >Map</code> instance during execution of both the initial script and
+        >Map</code> instance during execution of both the rule script and
         the validation script. This context map can be used by the initial
         rule script to store any results which should be inspected by the
         validator script to indicate if the previous cached result is still
         valid. If the validation script evaluates to <code>true</code> via the
         <code>ScriptResultEvaluator</code> then the cached result will be
-        used, otherwise the initial script will be re-executed.
+        used, otherwise the initial script will be re-executed. Any configured
+        <code>scriptBindings</code>, as well as the <code>RuleHelper</code>,
+        are available inside both the rule script and the validation script.
       </para>
       
       <example>
