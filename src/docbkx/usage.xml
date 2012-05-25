@@ -278,6 +278,16 @@
         are available inside both the rule script and the validation script.
       </para>
       
+      <note>
+        <para>
+          If the validator script evaluates to <code>false</code>, then a
+          new validation context map will be used when the initial rule
+          script is re-executed. The initial script should thus
+          <emphasis>always</emphasis> assume that it will be working with
+          an empty validation context. 
+        </para>
+      </note>
+      
       <example>
         <title>Using an inline validator rule.</title>
         <programlisting language="xml"
