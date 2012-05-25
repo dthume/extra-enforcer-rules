@@ -16,6 +16,7 @@
 
   <properties>
     <script.bindings.binding1>foo</script.bindings.binding1>
+    <custom.evaluator.expected>customPassingResult</custom.evaluator.expected>
   </properties>
 
   <build>
@@ -25,41 +26,42 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <configuration>
           <rules>
+            <!-- Test some basic return value types -->
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
               <script>1 === 1;</script>
             </scriptRule>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
               <script>1;</script>
             </scriptRule>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
               <script>true;</script>
             </scriptRule>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
               <script>1.1;</script>
             </scriptRule>
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
               <scriptFile>oneEqualsOne.js</scriptFile>
             </scriptRule>
-              <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
+            <!-- Test that custom bindings work as expected -->
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
               <script>binding1 === binding2;</script>
               <scriptBindings>
                 <binding1>${script.bindings.binding1}bar</binding1>
                 <binding2>foobar</binding2>
               </scriptBindings>
             </scriptRule>
+            <!-- Test that the helper can be accessed if required -->
             <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
-              <language>javascript</language>
-              <script>
-                "foo" == helper.evaluate("${script.bindings.binding1}");
-              </script>
+              <scriptFile>testHelper.js</scriptFile>
               <ruleHelperKey>helper</ruleHelperKey>
-            </scriptRule>          
+            </scriptRule>
+            <!-- Test that custom ScriptResultEvaluators work as expected -->
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <script>"${custom.evaluator.expected}";</script>
+              <resultEvaluator implementation="org.dthume.maven.enforcer.it.CustomScriptResultEvaluator">
+                <expected>${custom.evaluator.expected}</expected>
+              </resultEvaluator>
+            </scriptRule>
           </rules>
         </configuration>
       </plugin>

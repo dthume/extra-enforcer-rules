@@ -270,7 +270,9 @@
         rule script to store any results which should be inspected by the
         validator script to indicate if the previous cached result is still
         valid. If the validation script evaluates to <code>true</code> via the
-        <code>ScriptResultEvaluator</code> then the cached result will be
+        <code
+        xlink:href="./apidocs/org/dthume/maven/enforcer/ScriptResultEvaluator.html"
+        >ScriptResultEvaluator</code> then the cached result will be
         used, otherwise the initial script will be re-executed. Any configured
         <code>scriptBindings</code>, as well as the <code>RuleHelper</code>,
         are available inside both the rule script and the validation script.
@@ -369,6 +371,87 @@
   </build>
 </project>]]></programlisting>
       </example>
+    </section>
+
+    <section>
+      <title>Script Result Evaluation</title>
+      <para>
+        Both initial and validator scripts are expected to return some
+        object representing the success or failure of the script.
+        
+        This object is then, itself, normalized into a <code>boolean</code>
+        value (in order to support languages that do not directly support
+        <code>Boolean</code> types).
+        
+        The normalization process is strategised via the <code
+        xlink:href="./apidocs/org/dthume/maven/enforcer/ScriptResultEvaluator.html"
+        >ScriptResultEvaluator</code> interface, whose default implementation
+        (<code
+        xlink:href="./apidocs/org/dthume/maven/enforcer/DefaultScriptResultEvaluator.html"
+        >DefaultScriptResultEvaluator</code>)
+        follows (most of) the same rules as JavaScript in determining
+        "<link
+        xlink:href="http://james.padolsey.com/javascript/truthy-falsey/"
+        >truthiness</link>," specifically:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para><code>null</code> is <code>false</code></para>
+        </listitem>
+        <listitem>
+          <para>
+            <code>java.lang.Boolean</code> objects are returned as is.
+          </para>
+        </listitem>        
+        <listitem>
+          <para>
+            <code>java.lang.Number</code> objects are <code>false</code> if
+            they are zero, otherwise <code>true</code>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>All other objects are <code>true</code></para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        Note that, unlike JavaScript, the empty string is <code>true</code>.
+      </para>
+      <para>
+        While it is anticipated that this will cover most circumstances, a
+        custom evaluator can be used by specifying the
+        <code>resultEvaluator</code> property:
+      </para>
+      <example>
+        <title>Using a custom <code>ScriptRuleEvaluator</code>.</title>
+        <programlisting language="xml"
+><![CDATA[<project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>]]><?eval ${enforcerPluginVersion}?><![CDATA[</version>
+        <configuration>
+          <rules>
+            <scriptRule implementation="org.dthume.maven.enforcer.ScriptRule">
+              <language>javascript</language>
+              <scriptFile>src/script/someValidatorScript.js</scriptFile>
+              <resultEvaluator implementation="com.example.CustomEvaluator" />
+            </scriptRule>
+          </rules>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>custom-script-evaluator</artifactId>
+            <version>1.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>]]></programlisting>
+      </example>      
     </section>
   </section>
 </article>

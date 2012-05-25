@@ -41,6 +41,11 @@
               <artifactId>groovy-all</artifactId>
               <version>1.8.6</version>
             </dependency>
+            <dependency>
+              <groupId>org.dthume.maven.enforcer.it</groupId>
+              <artifactId>custom-script-result-evaluator</artifactId>
+              <version>0.1-SNAPSHOT</version>
+            </dependency>
           </dependencies>
         </plugin>
       </plugins>
