@@ -98,14 +98,19 @@
       <version>${org.apache.commons.commons-lang3.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>${org.apache.commons.commons-codec.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.bsf</groupId>
       <artifactId>bsf-api</artifactId>
       <version>${org.apache.bsf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dthume.maven</groupId>
+      <artifactId>maven-plugin-utils</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${org.apache.commons.commons-codec.version}</version>
     </dependency>
   </dependencies>
 

@@ -18,6 +18,7 @@ package org.dthume.maven.enforcer;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
+import static org.dthume.maven.util.LogWriter.LogLevel.ERROR;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +45,7 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.dthume.maven.enforcer.LogWriter.LogLevel;
+import org.dthume.maven.util.LogWriter;
 
 /**
  * An {@link EnforcerRule} which evaluates a JSR223 compliant script.
@@ -411,7 +412,7 @@ public final class ScriptRule implements EnforcerRule {
 
         private void configureIO(ScriptContext context) {
             context.setWriter(new LogWriter(log));
-            context.setErrorWriter(new LogWriter(log, LogLevel.ERROR));
+            context.setErrorWriter(new LogWriter(log, ERROR));
         }
     }
 }
